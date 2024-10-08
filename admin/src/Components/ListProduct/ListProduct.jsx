@@ -1,0 +1,58 @@
+import React, { useEffect, useState } from 'react'
+import './ListProduct.css'
+import cross_icon from '../../assets/cross_icon.png'
+const ListProduct = () => {
+
+    const [allproducts,setAllProducts] = useState([]);
+
+    const fetchInfo = async ()=>{
+        await fetch('http://localhost:4000/allproducts')
+        .then((res)=>res.json())
+        .then((data)=>{setAllProducts(data)});
+    }
+
+    useEffect(()=>{
+        fetchInfo();
+    }, [])
+
+    const remove_product = async (id)=>{
+        await fetch('http://localhost:4000/removeproduct',{
+            method:'POST',
+            headers:{
+                Accept:'application/json',
+                'Content-Type':'application/json'
+            },
+            body:JSON.stringify({id:id})
+        })
+        await fetchInfo();
+    }
+
+  return (
+    <div className='list-product'>
+        <h1>Todos Los Productos</h1>
+        <div className="listproduct-format-main">
+            <p>Productos</p>
+            <p>Titulo</p>
+            <p>Precio Viejo</p>
+            <p>Nuevo Precio</p>
+            <p>Eliminar</p>
+        </div>
+        <div className="listproduct-allproducts">
+            <hr />
+{allproducts.map((product,index)=>{
+    return <><div key={index} className="listproduct-format-main listproduct-format">
+        <img src={product.imagen} alt="" className="listproduct-product-icon" />
+        <p>{product.nombre}</p>
+        <p>${product.precio_viejo}</p>
+        <p>${product.precio_nuevo}</p>
+        <img onClick={()=>{remove_product(product.id)}} className='listproduct-remove-icon' src={cross_icon} alt="" />
+    </div>
+    <hr />
+    </>
+})}
+        </div>
+    </div>
+  )
+}
+
+export default ListProduct
